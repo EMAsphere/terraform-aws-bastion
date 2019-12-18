@@ -49,7 +49,7 @@ resource "aws_s3_bucket" "bucket" {
 resource "aws_s3_bucket_object" "bucket_public_keys_readme" {
   bucket  = aws_s3_bucket.bucket.id
   key     = "public-keys/README.txt"
-  content = "Drop here the ssh public keys of the instances you want to control"
+  content = "Drop here the ssh public keys of the users you want to authorize"
 }
 
 resource "aws_security_group" "bastion_host_security_group" {

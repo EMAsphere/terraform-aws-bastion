@@ -75,6 +75,14 @@ echo "proc /proc proc defaults,hidepid=2 0 0" >> /etc/fstab
 # Restart the SSH service to apply /etc/ssh/sshd_config modifications.
 service sshd restart
 
+#############################
+## INSTALL AWS CLI & other ##
+#############################
+
+apt update
+apt -y install awscli
+apt -y install redis-tools
+
 ############################
 ## EXPORT LOG FILES TO S3 ##
 ############################
