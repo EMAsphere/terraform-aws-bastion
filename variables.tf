@@ -109,3 +109,8 @@ variable "private_ssh_port" {
   default     = 22
 }
 
+variable "ami_image_id" {
+  description = "AMI id to use for the bastion server"
+  default     = "ami-0cc0a36f626a4fdf5"
+}
+

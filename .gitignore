@@ -7,3 +7,4 @@
 
 # Jetbrains
 .idea/
+/terraform-aws-bastion.iml
