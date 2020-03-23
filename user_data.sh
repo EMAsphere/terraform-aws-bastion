@@ -179,3 +179,10 @@ cat > ~/mycron << EOF
 EOF
 crontab ~/mycron
 rm ~/mycron
+
+
+#########################################
+## Add Custom extra_user_data_content ##
+#######################################
+
+${extra_user_data_content}
