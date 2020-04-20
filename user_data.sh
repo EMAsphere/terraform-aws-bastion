@@ -1,5 +1,9 @@
 #!/bin/bash -x
-yum -y update --security
+## yum -y update --security
+# See https://linoxide.com/linux-how-to/install-security-updates-ubuntu/
+# Also used in the crontab; see end of file
+apt-get -s dist-upgrade | grep "^Inst" | grep -i securi | awk -F " " {'print $2'} | xargs apt-get install
+
 
 ##########################
 ## ENABLE SSH RECORDING ##
@@ -8,8 +12,8 @@ yum -y update --security
 # Create a new folder for the log files
 mkdir /var/log/bastion
 
-# Allow ec2-user only to access this folder and its content
-chown ec2-user:ec2-user /var/log/bastion
+# Allow ubuntu only to access this folder and its content
+chown ubuntu:ubuntu /var/log/bastion
 chmod -R 770 /var/log/bastion
 setfacl -Rdm other:0 /var/log/bastion
 
@@ -63,7 +67,7 @@ chmod a+x /usr/bin/bastion/shell
 # 1. Add a random suffix to the log file name.
 # 2. Prevent bastion host users from listing the folder containing log files. This is done
 #    by changing the group owner of "script" and setting GID.
-chown root:ec2-user /usr/bin/script
+chown root:ubuntu /usr/bin/script
 chmod g+s /usr/bin/script
 
 # 3. Prevent bastion host users from viewing processes owned by other users, because the log
@@ -131,7 +135,8 @@ while read line; do
     # Create a user account if it does not already exist
     cut -d: -f1 /etc/passwd | grep -qx $USER_NAME
     if [ $? -eq 1 ]; then
-      /usr/sbin/adduser $USER_NAME && \
+      # https://en.wikipedia.org/wiki/Gecos_field
+      /usr/sbin/adduser --disabled-password --gecos "" $USER_NAME && \
       mkdir -m 700 /home/$USER_NAME/.ssh && \
       chown $USER_NAME:$USER_NAME /home/$USER_NAME/.ssh && \
       echo "$line" >> ~/keys_installed && \
@@ -175,7 +180,7 @@ chmod 700 /usr/bin/bastion/sync_users
 cat > ~/mycron << EOF
 */5 * * * * /usr/bin/bastion/sync_s3
 */5 * * * * /usr/bin/bastion/sync_users
-0 0 * * * yum -y update --security
+0 0 * * * apt-get -s dist-upgrade | grep "^Inst" | grep -i securi | awk -F " " {'print $2'} | xargs apt-get install
 EOF
 crontab ~/mycron
 rm ~/mycron
