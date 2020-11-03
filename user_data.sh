@@ -184,3 +184,51 @@ cat > ~/mycron << EOF
 EOF
 crontab ~/mycron
 rm ~/mycron
+
+
+############################
+## USEFUL SCRIPTS IN /SRV ##
+############################
+
+mkdir /srv/redis
+
+
+cat > /srv/redis/redis-cli-ema << 'EOF'
+#!/usr/bin/env bash
+redis-cli -h redis.emasphere.internal "$@"
+EOF
+chmod a+rx /srv/redis/redis-cli-ema
+
+##
+
+cat > /srv/redis/redis-cli-ema-count-keys << 'EOF'
+#!/usr/bin/env bash
+echo "Counting..."
+echo
+
+SPRING_KEYS=$(./redis-cli-ema --scan --pattern spring:* | wc -l)
+ACL_KEYS=$(./redis-cli-ema --scan --pattern emasphere:accesscontrol:*:* | wc -l)
+TENANT_KEYS=$(./redis-cli-ema --scan --pattern emasphere:tenant:*:* | wc -l)
+
+echo "ACL keys              : $ACL_KEYS"
+echo "Tenantkeys            : $TENANT_KEYS"
+echo "Spring sessions keys  : $SPRING_KEYS"
+echo
+EOF
+chmod a+rx /srv/redis/redis-cli-ema-count-keys
+
+##
+
+cat > /srv/redis/redis-cli-ema-flush-sessions << 'EOF'
+#!/usr/bin/env bash
+./redis-cli-ema --scan --pattern spring:* | xargs ./redis-cli-ema del
+EOF
+chmod a+rx /srv/redis/redis-cli-ema-flush-sessions
+
+##
+
+cat > /srv/redis/redis-cli-ema-flush-tenants << 'EOF'
+#!/usr/bin/env bash
+./redis-cli-ema --scan --pattern emasphere:tenant:* | xargs ./redis-cli-ema del
+EOF
+chmod a+rx /srv/redis/redis-cli-ema-flush-tenants
